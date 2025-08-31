@@ -10,13 +10,18 @@ from typing import Optional, Union
 from pathlib import Path
 import logging
 
-# Try to import yfinance, but make it optional for Python 3.8 compatibility
+# Try to import yfinance, but make it completely optional
+YFINANCE_AVAILABLE = False
+yf = None
+
 try:
     import yfinance as yf
     YFINANCE_AVAILABLE = True
 except ImportError:
-    YFINANCE_AVAILABLE = False
-    yf = None
+    pass
+except Exception:
+    # Handle any other import errors (like Python 3.8 compatibility issues)
+    pass
 
 
 class DataLoader:
@@ -58,7 +63,7 @@ class DataLoader:
             if YFINANCE_AVAILABLE:
                 return self._load_from_yahoo(source, start_date, end_date)
             else:
-                raise ImportError("yfinance not available. Please install it with: pip install yfinance")
+                raise ImportError("yfinance not available. Please use CSV files instead.")
     
     def _is_file_path(self, source: str) -> bool:
         """Check if source is a file path."""
@@ -130,7 +135,7 @@ class DataLoader:
             DataFrame with OHLCV data
         """
         if not YFINANCE_AVAILABLE:
-            raise ImportError("yfinance not available. Please install it with: pip install yfinance")
+            raise ImportError("yfinance not available. Please use CSV files instead.")
             
         try:
             # Download data from Yahoo Finance
